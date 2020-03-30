@@ -17,7 +17,12 @@
 </header>
 <body onload="calculate()">
     <h2>Problema das N rainhas</h2>
-    Tamanho: <input type="number" max="25" id="n" value=5><button onclick="calculate()">calculate</button>
+    Tamanho: <input type="number" max="25" id="n" value=5><br/>
+    Mehtod: <select id="method">
+        <option value="dataStructure">Breadth-First Search</option>
+        <option value="stack">Depth-First Search</option>
+    </select><br/>
+    <button onclick="calculate()">calculate</button>
     <br/><br/>
     <hr />
     <div id="board"></div>
@@ -73,6 +78,13 @@
         
 
         function search(n) {
+
+            var method = document.getElementById("method").value;
+
+            if(method==undefined) {
+                method = "dataStructure";
+            }
+
             var board = [];
             for (let i = 0; i < n; i++) {
                 var line = [];
@@ -82,11 +94,16 @@
                 board.push(line);
             }
 
-            var queue = [{t: board, row:0, col:null} ];
+            var dataStructure = [{t: board, row:0, col:null} ];
             var founded = false;
 
             while(!founded) {
-                node = queue.pop();
+                node = {};
+                if (method == "dataStructure") {
+                    node = dataStructure.shift();
+                } else {
+                    node = dataStructure.pop();
+                }   
                 if(node == null) {
                     return null; // não founded solução
                 }
@@ -111,7 +128,7 @@
                             tnode[i] = t[i].slice();
                         }
                         tnode[r][col] = "R";
-                        queue.push({t: tnode, row:r, col:col+1});
+                        dataStructure.push({ t: tnode, row: r, col: col + 1 });
                     }
                 }
             }
