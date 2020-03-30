@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    body {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 11px;
+        font-weight: 300;
+        fill: #242424;
+        text-align: left;
+        text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+        cursor: default;
+    }
+</style>
+<!-- Google fonts -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300" rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+</header>
+<body onload="calculate()">
+    <h2>Problema das N rainhas</h2>
+    Tamanho: <input type="number" max="25" id="n" value=5><button onclick="calculate()">calculate</button>
+    <br/><br/>
+    <hr />
+    <div id="board"></div>
+    <hr />
+    <sub>
+        Desenvolvido por Joaquim Pessôa Filho
+    </sub>
+    
+    <script>
+        function showBoard(board) {
+
+            var boardHTML = document.getElementById("board");
+            boardHTML.innerHTML = "";
+
+            if (board == null) {
+                boardHTML.innerHTML = "Nenhuma resposta encontrada";
+                return;
+            }
+
+            var table = "<table border=\"1\">";
+            for (let i = 0; i < board.length; i++) {
+                table += "<tr height=\"20px\">"
+                for (let j = 0; j < board[i].length; j++) {
+                    table += "<td width=\"20px\">" + board[i][j] + "</td>"
+                }
+                table += "</tr>"
+            }
+            table += "</table>"
+            boardHTML.innerHTML = table;
+        }
+
+        function legalMove(board, row, col) {
+            console.log("Veriricando", board,row,col);
+            //verificar colunas anteriores
+            for (let i = col-1; i >= 0; i--) {
+                if(board[row][i] == "R")
+                    return false;
+            }
+
+            //diagonal superior (antes da coluna)
+            for (let i = row-1, j = col-1; i >= 0 && j >= 0; i--, j--) {
+                if (board[i][j] == "R")
+                    return false;
+            }
+
+            //diagonal inferior (antes da coluna)
+            for (let i = row + 1, j = col - 1; i < board.length && j >= 0; i++, j--) {
+                if (board[i][j] == "R")
+                    return false;
+            }
+            return true;
+        }
+        
+
+        function search(n) {
+            var board = [];
+            for (let i = 0; i < n; i++) {
+                var line = [];
+                for (let j = 0; j < n; j++) {
+                    line.push(' ');
+                }
+                board.push(line);
+            }
+
+            var queue = [{t: board, row:0, col:null} ];
+            var founded = false;
+
+            while(!founded) {
+                node = queue.pop();
+                if(node == null) {
+                    return null; // não founded solução
+                }
+
+                var row = node.row;
+                var col = node.col;
+                var t = node.t;
+
+                if(col == n) { //founded solução
+                    return t;
+                }
+
+                if(col == null) {
+                    col = 0;
+                }
+                
+                for (let r = 0; r < t[col].length; r++) { // varre registrando possiveis soluções pra esta coluna
+                    if (legalMove(t, r, col)) { // jogada permitida?
+                        //copia do board
+                        var tnode = [];
+                        for(var i=0; i<t.length; i++) {
+                            tnode[i] = t[i].slice();
+                        }
+                        tnode[r][col] = "R";
+                        queue.push({t: tnode, row:r, col:col+1});
+                    }
+                }
+            }
+
+            return board;
+        }
+
+        
+        function calculate() {
+            var nHtml = document.getElementById("n");
+            var n = nHtml.value;
+
+            if(n>25) {
+                n=25;
+                nHtml.value = 25;
+            }
+
+            if(n<1) {
+                n=1;
+                nHtml.value = 1;
+            }
+
+            showBoard(search(n));
+        }
+    </script>
+</body>
+</html>
